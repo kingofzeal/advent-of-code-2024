@@ -55,16 +55,24 @@ int Part2(){
     }
 
     foreach (var pageList in pages){
-        Console.WriteLine($"Checking {string.Join(',', pageList)}...");
+        Console.Write($"Checking {string.Join(',', pageList)}...");
 
         var applicableRules = rules.Where(x => pageList.Contains(x[0]) && pageList.Contains(x[1])).ToList();
 
         var (valid, breakingRule) = CheckRules(applicableRules, pageList);
-        if (valid) continue;
+        if (valid){
+            Console.WriteLine(" Valid.");
+            continue;
+        }
+
+        Console.WriteLine(" Invalid.");
 
         var currentPageSet = pageList.ToList();
 
+        var swaps = 0;
+
         while (!valid){
+            swaps++;
             var idx0 = currentPageSet.IndexOf(breakingRule![0]);
             var idx1 = currentPageSet.IndexOf(breakingRule[1]);
 
@@ -75,7 +83,7 @@ int Part2(){
         }
 
         var middleNum = int.Parse(currentPageSet[(currentPageSet.Count - 1) / 2]);
-        Console.WriteLine($"{string.Join(',', currentPageSet)} is the valid order. Adding {middleNum} to total");
+        Console.WriteLine($"         {string.Join(',', currentPageSet)} is the valid order after {swaps} swaps. Adding {middleNum} to total");
 
         middleSum += middleNum;
     }
@@ -85,5 +93,4 @@ int Part2(){
 }
 
 //var p1 = Part1(); Console.WriteLine($"Part 1: {p1}");
-
 var p2 = Part2(); Console.WriteLine($"Part 2: {p2}");
