@@ -60,42 +60,34 @@ long Part2()
 		FileSize = idx % 2 == 0 ? int.Parse(val.ToString()) : 0,
 		Index = idx % 2 == 0 ? idx / 2 : 0
 	}).ToList();
-	//var desc = input.Select((val, idx) => idx % 2 == 0 ? (file: int.Parse(val.ToString()), idx: idx / 2, empty: 0) : (file: 0, idx: 0, empty: int.Parse(val.ToString()))).ToList();
 
-	for (var i = desc.Count - 1; i > 0; i--)
+	for (var i = desc.Max(x => x.Index); i >= 0; i--)
 	{
-		var file = desc[i];
+		var fileIdx = desc.FindIndex(x => x.Index == i);
+		var file = desc[fileIdx];
 
-		if (file.IsEmpty || file.IsMoved)
+		var newIdx = desc.FindIndex(0, x => x.EmptySize >= file.FileSize);
+
+		if (newIdx < 0 || newIdx > fileIdx)
 		{
 			continue;
 		}
 
-		var idx = desc.FindIndex(0, x => x.EmptySize >= file.FileSize);
-
-		if (idx < 0 || idx >= i)
-		{
-			continue;
-		}
-
-		var empty = desc[idx];
+		var empty = desc[newIdx];
 
 		desc.Remove(file);
-		desc.Insert(idx, file);
-		file.IsMoved = true;
+		desc.Insert(newIdx, file);
 
 		if (empty.EmptySize == file.FileSize)
 		{
-			desc.RemoveAt(idx + 1);
+			desc.RemoveAt(newIdx + 1);
 		}
 		else
 		{
 			empty.EmptySize -= file.FileSize;
 		}
-		desc.Insert(i, new Parsed
-		{
-			EmptySize = file.FileSize
-		});
+
+		desc.Insert(fileIdx, new Parsed { EmptySize = file.FileSize });
 	}
 
 	var fs = new List<int?>();
@@ -133,7 +125,7 @@ long p2 = 0;
 p2 = Part2();
 
 Console.WriteLine($"Part 1: {p1}");
-Console.WriteLine($"Part 2: {p2}"); //6225046593422
+Console.WriteLine($"Part 2: {p2}");
 
 
 class Parsed
