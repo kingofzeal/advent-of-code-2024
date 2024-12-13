@@ -5,8 +5,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 
-//var inputFile = File.ReadAllLines("./input.txt");
-var inputFile = File.ReadAllLines("./sample.txt");
+var inputFile = File.ReadAllLines("./input.txt");
+//var inputFile = File.ReadAllLines("./sample.txt");
 
 var input = inputFile.ToList();
 
@@ -76,7 +76,45 @@ long Part1()
 
 long Part2()
 {
-	return 0L;
+	var rgBut = new Regex(@"Button [A|B]: X\+(\d+), Y\+(\d+)");
+	var rgPrize = new Regex(@"Prize: X=(\d+), Y=(\d+)");
+
+	var prizeCount = 0;
+	var prizeCost = 0L;
+
+	for (var machine = 0; machine < input.Count; machine += 4)
+	{
+		var bA = input[machine];
+		var aMatch = rgBut.Match(bA);
+		var aMvX = int.Parse(aMatch.Groups[1].Value);
+		var aMvY = int.Parse(aMatch.Groups[2].Value);
+
+		var bB = input[machine + 1];
+		var bMatch = rgBut.Match(bB);
+		var bMvX = int.Parse(bMatch.Groups[1].Value);
+		var bMvY = int.Parse(bMatch.Groups[2].Value);
+
+		var p = input[machine + 2];
+		var pMatch = rgPrize.Match(p);
+		var pX = int.Parse(pMatch.Groups[1].Value) + 10000000000000;
+		var pY = int.Parse(pMatch.Groups[2].Value) + 10000000000000;
+
+		Console.WriteLine($"{bA} ({aMvX}, {aMvY}), {bB} ({bMvX}, {bMvY}), {p} ({pX}, {pY})");
+
+		var bCt = (pY * aMvX - pX * aMvY) / (bMvY * aMvX - bMvX * aMvY);
+		var aCt = (pX - bCt * bMvX) / aMvX;
+		if (aCt >= 0 &&
+				bCt >= 0 &&
+				bCt * bMvX + aCt * aMvX == pX &&
+				bCt * bMvY + aCt * aMvY == pY)
+		{
+			Console.WriteLine($"{aCt} {bCt}");
+			prizeCost += aCt * 3 + bCt;
+		}
+
+	}
+
+	return prizeCost;
 }
 
 long p1 = 0;
